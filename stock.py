@@ -115,6 +115,8 @@ class stock():
                 continue
 
             if stock in forecastSet:
+                if not isinstance(self.__forecastLastYear[self.__forecastLastYear.code == stock]['range'].values[0], float):
+                    continue    #todo is not float
                 #print('%06d, range %.2f' % (stock, self.__forecastLastYear[self.__forecastLastYear.code == stock]['range'].values[0]))
                 pe = self.peNow(stock)
                 inc = float(self.__forecastLastYear[self.__forecastLastYear.code == stock]['range'].values[0])
