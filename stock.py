@@ -21,8 +21,8 @@ class stock():
                     str(self.__yearBegin+i) + 'Growth.xls','Growth',na_values=['NA']) \
                          for i in range(self.__yearRange)]
 
-        self.__stocksL = set(self.__pdYearGrowth[3].code.values)
-        self.__stocksNow = set(self.__pdYearGrowth[4].code.values)      # 出了年报的股票
+        self.__stocksL = set(self.__pdYearReport[3].code.values)
+        self.__stocksNow = set(self.__pdYearReport[4].code.values)      # 出了年报的股票
         self.__stocksNotNow = set(self.__stocksL - self.__stocksNow)
         #self.__stockNotNew = self.__stockBasics[(self.__stockBasics.timeToMarket < 20160101) &
         #                    (self.__stockBasics.timeToMarket != 0)].index.values.astype(int)
