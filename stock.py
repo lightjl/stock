@@ -7,7 +7,7 @@ class stock():
     def __init__(self):
         self.__yearRange = 5        #5年 从2012到2016
         self.__yearBegin = datetime.now().year-self.__yearRange
-        #self.__getYearReportOnline()
+        self.__getYearReportOnline()
 
         self.getThingsEveryday()
         #print(yearbegin)
@@ -42,7 +42,6 @@ class stock():
 
     def getThingsEveryday(self):
         yearEnd = datetime.now().year-1
-
 
         pdProfitLastYear = ts.get_profit_data(yearEnd, 4)
         pdProfitLastYear.to_excel('./' + \
@@ -156,6 +155,13 @@ class stock():
         for i in range(self.__yearRange):
             pdReportLastYear[i].to_excel('./' + \
                     str(yearbegin+i) + 'y.xls', sheet_name='Report')
+
+
+        pdYearGrowth = [ts.get_growth_data(yearbegin+i,4) \
+                        for i in range(self.__yearRange)]
+        for i in range(self.__yearRange):
+            pdYearGrowth[i].to_excel('./' + \
+                    str(yearbegin+i) + 'Growth.xls', sheet_name='Growth')
 
     def pickHHCG(self):
         #gross_profit_rate 毛利率
