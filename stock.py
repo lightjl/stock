@@ -11,10 +11,10 @@ class stock():
 
         self.getThingsEveryday()
         #print(yearbegin)
-        self.__pdYearReport = [pd.read_excel('D:/zzz/joinquant/data4stock/' + \
+        self.__pdYearReport = [pd.read_excel('./' + \
                     str(self.__yearBegin+i) + 'y.xls','Report',na_values=['NA']) \
                          for i in range(self.__yearRange)]
-        self.__pdYearProfit = [pd.read_excel('D:/zzz/joinquant/data4stock/' + \
+        self.__pdYearProfit = [pd.read_excel('./' + \
                     str(self.__yearBegin+i) + 'Profit.xls', sheet_name='Profit',na_values=['NA'])\
                                for i in range(self.__yearRange)]
 
