@@ -71,8 +71,8 @@ class stock():
             self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
 
         YP4 = self.pdYear4Report
-        czg = YP4[(YP4.yoy1 > self.per)
-                & (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
+        czg = YP4[              (YP4.yoy1 > self.per) &    #todo 3年增长
+                (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
 
         stockHaveReportLastYear = set(self.__pdYearReport[4].code.values)
 
@@ -86,6 +86,7 @@ class stock():
             pe = self.peNow(stock)
             if stock not in self.__stocksNow:
                 inc = YP4[YP4.code == stock].yoy3.values[0]
+                peg = pe/inc
                 if dy[dy.code == ('%06d' % stock)]['area'].values[0] == '广东':
                     if pe < 50 and peg > 0 and peg < 2:
                         stocksGD.append(['%06d' % stock, YP4[YP4.code == stock].name_x.values[0][0], \
@@ -145,13 +146,13 @@ class stock():
         pdYearProfit = [ts.get_profit_data(yearbegin+i,4) \
                         for i in range(self.__yearRange)]
         for i in range(self.__yearRange):
-            pdYearProfit[i].to_excel('D:/zzz/joinquant/data4stock/' + \
+            pdYearProfit[i].to_excel('./' + \
                     str(yearbegin+i) + 'Profit.xls', sheet_name='Profit')
 
         pdReportLastYear = [ts.get_report_data(yearbegin+i,4) \
                         for i in range(self.__yearRange)]
         for i in range(self.__yearRange):
-            pdReportLastYear[i].to_excel('D:/zzz/joinquant/data4stock/' + \
+            pdReportLastYear[i].to_excel('./' + \
                     str(yearbegin+i) + 'y.xls', sheet_name='Report')
 
     def pickHHCG(self):

@@ -5,7 +5,6 @@ import WorkInTime as wk
 import sendMail as sm
 from datetime import datetime
 
-#print(s.peNow(600522))
 class iw:
     def __init__(self, wl):
         '''
@@ -54,15 +53,18 @@ class iw:
         pass
 
 watchlist = [
-            [600522, 'price', '低', 11.25, True, "中天科技"],
-            [600522, 'pe', '低', 22.95, True],
-            #[2078, 'price', '低', 7.1, True, "太阳纸业"],
+            #[600522, 'price', '低', 11.25, True, "中天科技"],
+            #[600522, 'pe', '低', 22.95, True, "中天科技"],
+            #[2078, 'price', '低', 6.66, True, "太阳纸业"],
             [2078, 'price', '高', 7.9, True, "太阳纸业"],
-            [600816, 'pe', '低', 15, True, "安信信托"],
-            [600816, 'price', '低', 11.11, True]
+            #[600816, 'pe', '低', 15, True, "安信信托"],
+            #[600816, 'price', '低', 11.11, True],
+            [600518, 'price', '低', 17.36, True, "康美药业"],
+            #[300182, 'price', '低', 9.00, True, "捷成股份"]
             ]#600816
 
-timeTrade = [['9:25', '11:30'], ['13:00', '15:00']]
+timeTrade = [['9:26', '11:30'], ['13:00', '15:00']]
+#timeTrade = [['9:25', '9:25'], ['10:00']*2]
 workTime = wk.WorkInTime(timeTrade)
 
 for text in watchlist:
@@ -75,4 +77,3 @@ while True:
         if workTime.isNewDay():
             ic.getNewdayThings()
         ic.run()
-        time.sleep(5)
