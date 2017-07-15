@@ -45,10 +45,10 @@ class stock():
 
 
         pdProfitLastYear = ts.get_profit_data(yearEnd, 4)
-        pdProfitLastYear.to_excel('D:/zzz/joinquant/data4stock/' + \
+        pdProfitLastYear.to_excel('./' + \
                     str(yearEnd) + 'Profit.xls', sheet_name='Profit')
         pdReportLastYear = ts.get_report_data(yearEnd, 4)
-        pdReportLastYear.to_excel('D:/zzz/joinquant/data4stock/' + \
+        pdReportLastYear.to_excel('./' + \
                     str(yearEnd) + 'y.xls', sheet_name='Report')
 
 
