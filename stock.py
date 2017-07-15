@@ -7,7 +7,7 @@ class stock():
     def __init__(self):
         self.__yearRange = 5        #5年 从2012到2016
         self.__yearBegin = datetime.now().year-self.__yearRange
-        self.__getYearReportOnline()
+        #self.__getYearReportOnline()
 
         self.getThingsEveryday()
         #print(yearbegin)
@@ -17,9 +17,12 @@ class stock():
         self.__pdYearProfit = [pd.read_excel('./' + \
                     str(self.__yearBegin+i) + 'Profit.xls', sheet_name='Profit',na_values=['NA'])\
                                for i in range(self.__yearRange)]
+        self.__pdYearGrowth = [pd.read_excel('./' + \
+                    str(self.__yearBegin+i) + 'Growth.xls','Growth',na_values=['NA']) \
+                         for i in range(self.__yearRange)]
 
-        self.__stocksL = set(self.__pdYearReport[3].code.values)
-        self.__stocksNow = set(self.__pdYearReport[4].code.values)      # 出了年报的股票
+        self.__stocksL = set(self.__pdYearGrowth[3].code.values)
+        self.__stocksNow = set(self.__pdYearGrowth[4].code.values)      # 出了年报的股票
         self.__stocksNotNow = set(self.__stocksL - self.__stocksNow)
         #self.__stockNotNew = self.__stockBasics[(self.__stockBasics.timeToMarket < 20160101) &
         #                    (self.__stockBasics.timeToMarket != 0)].index.values.astype(int)
@@ -43,6 +46,9 @@ class stock():
     def getThingsEveryday(self):
         yearEnd = datetime.now().year-1
 
+        pdGrowthLastYear = ts.get_growth_data(yearEnd, 4)
+        pdGrowthLastYear.to_excel('./' + \
+                    str(yearEnd) + 'Growth.xls', sheet_name='Growth')
         pdProfitLastYear = ts.get_profit_data(yearEnd, 4)
         pdProfitLastYear.to_excel('./' + \
                     str(yearEnd) + 'Profit.xls', sheet_name='Profit')
@@ -70,10 +76,19 @@ class stock():
             self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
 
         YP4 = self.pdYear4Report
+        ''' 成长能力
+        for i in range(self.__yearRange):   #5年 从2012到2016 1-4
+            self.__pdYearGrowth[i].rename(columns={'nprg': 'yoy'+str(i)}, inplace = True)
+        self.pdYear4Growth = self.__pdYearGrowth[0].copy()
+        for i in range(1, self.__yearRange-1):
+            self.pdYear4Growth = self.pdYear4Report.merge(self.__pdYearGrowth[i],on='code')
+
+        YP4 = self.pdYear4Growth
+        '''
         czg = YP4[              (YP4.yoy1 > self.per) &    #todo 3年增长
                 (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
 
-        stockHaveReportLastYear = set(self.__pdYearReport[4].code.values)
+        #stockHaveReportLastYear = set(self.__pdYearGrowth[4].code.values)
 
         stockSet = set(czg['code'].values)
         stocksCZG = []
