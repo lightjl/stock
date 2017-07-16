@@ -8,6 +8,10 @@ class stock():
         self.__yearRange = 5        #5年 从2012到2016
         self.__yearBegin = datetime.now().year-self.__yearRange
         #self.__getYearReportOnline()
+        self.__flagUpdateReport = False
+        flag = input('Update report now(Y/N):')
+        if flag == 'Y' or flag == 'y':
+            self.__flagUpdateReport = True
 
         self.getThingsEveryday()
         #print(yearbegin)
@@ -46,15 +50,16 @@ class stock():
     def getThingsEveryday(self):
         yearEnd = datetime.now().year-1
 
-        pdGrowthLastYear = ts.get_growth_data(yearEnd, 4)
-        pdGrowthLastYear.to_excel('./' + \
-                    str(yearEnd) + 'Growth.xls', sheet_name='Growth')
-        pdProfitLastYear = ts.get_profit_data(yearEnd, 4)
-        pdProfitLastYear.to_excel('./' + \
-                    str(yearEnd) + 'Profit.xls', sheet_name='Profit')
-        pdReportLastYear = ts.get_report_data(yearEnd, 4)
-        pdReportLastYear.to_excel('./' + \
-                    str(yearEnd) + 'y.xls', sheet_name='Report')
+        if self.__flagUpdateReport:
+            pdGrowthLastYear = ts.get_growth_data(yearEnd, 4)
+            pdGrowthLastYear.to_excel('./' + \
+                        str(yearEnd) + 'Growth.xls', sheet_name='Growth')
+            pdProfitLastYear = ts.get_profit_data(yearEnd, 4)
+            pdProfitLastYear.to_excel('./' + \
+                        str(yearEnd) + 'Profit.xls', sheet_name='Profit')
+            pdReportLastYear = ts.get_report_data(yearEnd, 4)
+            pdReportLastYear.to_excel('./' + \
+                        str(yearEnd) + 'y.xls', sheet_name='Report')
 
 
         self.__stockBasics = ts.get_stock_basics()  #获得昨天pe
