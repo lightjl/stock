@@ -44,6 +44,13 @@ class stock():
         #pdtest.to_excel('D:/zzz/joinquant/data4stock/' + str('test') + 'Profit.xls', sheet_name='Profit')
         print('\n')
 
+        for i in range(self.__yearRange):
+            self.__pdYearReport[i].rename(columns={'profits_yoy': 'yoy'+str(i)}, inplace = True)
+        self.pdYear4Report = self.__pdYearReport[0].copy()
+        for i in range(1, self.__yearRange-1):
+            self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
+
+
     def stockNotNow(self):
         return self.__stocksNotNow
 
@@ -74,12 +81,6 @@ class stock():
 
     def peg_stock(self):
         self.per = 20
-        for i in range(self.__yearRange):
-            self.__pdYearReport[i].rename(columns={'profits_yoy': 'yoy'+str(i)}, inplace = True)
-        self.pdYear4Report = self.__pdYearReport[0].copy()
-        for i in range(1, self.__yearRange-1):
-            self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
-
         YP4 = self.pdYear4Report
         ''' 成长能力
         for i in range(self.__yearRange):   #5年 从2012到2016 1-4
@@ -161,6 +162,30 @@ class stock():
         #print(self.__pdYearReport)
         print(pdCZG['code'].values)
         print(pdFCZG['code'].values)
+
+    def analyse(self, stockList):
+        YP4 = self.pdYear4Report
+        czg = YP4[ (YP4.yoy1 > self.per) &    #todo 3年增长
+                (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
+        for stockStr in stockList:
+            stock = int(stockStr)
+            result = []
+            stockYP4 = YP4[YP4.code == stock]
+            result.append([stockYP4.yoy1.values[0], \
+                           stockYP4.yoy2.values[0], \
+                           stockYP4.yoy3.values[0]]
+                          )
+            pe = self.peNow(stock)
+            if stock not in self.__stocksNow:
+                inc = YP4[YP4.code == stock].yoy3.values[0]
+                result.append(' ')
+            else:   #去年年报已出
+                inc = self.__pdYearReport[4][self.__pdYearReport[4].code == stock].yoy4.values[0]
+                result.append(inc)
+            peg = pe/inc
+            result.append(peg)
+            print(stockStr + ' ' +result)
+
 
     def __getYearReportOnline(self):
         yearbegin = datetime.now().year-self.__yearRange
@@ -248,6 +273,8 @@ class stock():
 
 s = stock()
 s.peg_stock()
+watchlist = ['600522', '002078']
+s.analyse(watchlist)
 
 
 #pdF = ts.forecast_data(2016, 4)
