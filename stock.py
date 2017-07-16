@@ -50,6 +50,14 @@ class stock():
         for i in range(1, self.__yearRange-1):
             self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
 
+        # 成长能力
+        for i in range(self.__yearRange):   #5年 从2012到2016 1-4
+            self.__pdYearGrowth[i].rename(columns={'nprg': 'yoy'+str(i)}, inplace = True)
+        self.pdYear4Growth = self.__pdYearGrowth[0].copy()
+        for i in range(1, self.__yearRange-1):
+            self.pdYear4Growth = self.pdYear4Report.merge(self.__pdYearGrowth[i],on='code')
+
+        YP4 = self.pdYear4Growth
 
     def stockNotNow(self):
         return self.__stocksNotNow
@@ -81,16 +89,9 @@ class stock():
 
     def peg_stock(self):
         self.per = 20
-        YP4 = self.pdYear4Report
-        ''' 成长能力
-        for i in range(self.__yearRange):   #5年 从2012到2016 1-4
-            self.__pdYearGrowth[i].rename(columns={'nprg': 'yoy'+str(i)}, inplace = True)
-        self.pdYear4Growth = self.__pdYearGrowth[0].copy()
-        for i in range(1, self.__yearRange-1):
-            self.pdYear4Growth = self.pdYear4Report.merge(self.__pdYearGrowth[i],on='code')
-
+        #YP4 = self.pdYear4Report   #年报
         YP4 = self.pdYear4Growth
-        '''
+
         czg = YP4[              (YP4.yoy1 > self.per) &    #todo 3年增长
                 (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
 
@@ -164,7 +165,7 @@ class stock():
         print(pdFCZG['code'].values)
 
     def analyse(self, stockList):
-        YP4 = self.pdYear4Report
+        YP4 = self.pdYear4Growth
         czg = YP4[ (YP4.yoy1 > self.per) &    #todo 3年增长
                 (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
         for stockStr in stockList:
