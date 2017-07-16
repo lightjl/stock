@@ -25,8 +25,8 @@ class stock():
                     str(self.__yearBegin+i) + 'Growth.xls','Growth',na_values=['NA']) \
                          for i in range(self.__yearRange)]
 
-        self.__stocksL = set(self.__pdYearReport[3].code.values)
-        self.__stocksNow = set(self.__pdYearReport[4].code.values)      # 出了年报的股票
+        self.__stocksL = set(self.__pdYearGrowth[3].code.values)
+        self.__stocksNow = set(self.__pdYearGrowth[4].code.values)      # 出了年报的股票
         self.__stocksNotNow = set(self.__stocksL - self.__stocksNow)
         #self.__stockNotNew = self.__stockBasics[(self.__stockBasics.timeToMarket < 20160101) &
         #                    (self.__stockBasics.timeToMarket != 0)].index.values.astype(int)
@@ -50,14 +50,13 @@ class stock():
         for i in range(1, self.__yearRange-1):
             self.pdYear4Report = self.pdYear4Report.merge(self.__pdYearReport[i],on='code')
 
-        # 成长能力
-        for i in range(self.__yearRange):   #5年 从2012到2016 1-4
+        # 4年成长能力
+        for i in range(self.__yearRange):   #5年 从2012到2016 0-4
             self.__pdYearGrowth[i].rename(columns={'nprg': 'yoy'+str(i)}, inplace = True)
         self.pdYear4Growth = self.__pdYearGrowth[0].copy()
         for i in range(1, self.__yearRange-1):
-            self.pdYear4Growth = self.pdYear4Report.merge(self.__pdYearGrowth[i],on='code')
+            self.pdYear4Growth = self.pdYear4Growth.merge(self.__pdYearGrowth[i],on='code')
 
-        YP4 = self.pdYear4Growth
 
     def stockNotNow(self):
         return self.__stocksNotNow
@@ -114,7 +113,7 @@ class stock():
                                          round(pe, 2), round(inc, 2), round(peg, 2),
                                          dy[dy.code == ('%06d' % stock)]['area'].values[0]])
             else:   #去年年报已出
-                inc = self.__pdYearReport[4][self.__pdYearReport[4].code == stock].yoy4.values[0]
+                inc = self.__pdYearGrowth[4][self.__pdYearGrowth[4].code == stock].yoy4.values[0]
             peg = pe/inc
             if pe < 30 and peg > 0 and peg < 0.8:
                 #print('%06d %s pe %.2f, inc %.2f%%,peg %.2f' %(stock, YP4[YP4.code == stock].name_x.values[0][0], pe, inc, peg))
@@ -132,6 +131,8 @@ class stock():
         stocksFCZG = []
         #print(dy[dy.code.isin(fpegStock)])
         for stock in stockSet:
+            if stock in self.__stocksNow:
+                continue
             if self.__pdForwardEps[self.__pdForwardEps.code == stock].empty:
                 continue
 
@@ -168,24 +169,25 @@ class stock():
         YP4 = self.pdYear4Growth
         czg = YP4[ (YP4.yoy1 > self.per) &    #todo 3年增长
                 (YP4.yoy2 > self.per) & (YP4.yoy3 > self.per)]
+        #print(YP4)
         for stockStr in stockList:
             stock = int(stockStr)
             result = []
+            result.append(stockStr)
             stockYP4 = YP4[YP4.code == stock]
-            result.append([stockYP4.yoy1.values[0], \
-                           stockYP4.yoy2.values[0], \
-                           stockYP4.yoy3.values[0]]
-                          )
+            result.append(round(stockYP4.yoy1.values[0], 2))
+            result.append(round(stockYP4.yoy2.values[0], 2))
+            result.append(round(stockYP4.yoy3.values[0], 2))
             pe = self.peNow(stock)
             if stock not in self.__stocksNow:
                 inc = YP4[YP4.code == stock].yoy3.values[0]
                 result.append(' ')
             else:   #去年年报已出
-                inc = self.__pdYearReport[4][self.__pdYearReport[4].code == stock].yoy4.values[0]
-                result.append(inc)
+                inc = self.__pdYearGrowth[4][self.__pdYearGrowth[4].code == stock].yoy4.values[0]
+                result.append(round(inc,2))
             peg = pe/inc
             result.append(peg)
-            print(stockStr + ' ' +result)
+            print(result)
 
 
     def __getYearReportOnline(self):
@@ -275,6 +277,7 @@ class stock():
 s = stock()
 s.peg_stock()
 watchlist = ['600522', '002078']
+watchlist = ['002078', '600522']
 s.analyse(watchlist)
 
 
